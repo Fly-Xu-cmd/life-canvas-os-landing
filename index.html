@@ -1,1080 +1,1254 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Life Canvas OS - AI 驱动的个人成长桌面操作系统</title>
     <style>
-        /* CSS Reset & Base */
-        *, *::before, *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+      /* CSS Reset & Base */
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        /* 主色调 */
+        --bg-primary: #0a0a0f;
+        --bg-secondary: #0f172a;
+        --bg-card: rgba(15, 23, 42, 0.6);
+        --accent-purple: #7a5bf5;
+        --accent-purple-light: #e5a4ed;
+        --accent-cyan: #21c2c1;
+        --accent-green: #84f599;
+        --accent-orange: #f97316;
+
+        /* 辅助色 */
+        --text-primary: #ffffff;
+        --text-secondary: #94a3b8;
+        --text-muted: #64748b;
+        --border-glow: rgba(122, 91, 245, 0.5);
+        --border-glow-cyan: rgba(33, 194, 193, 0.5);
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(
+          135deg,
+          var(--bg-primary) 0%,
+          var(--bg-secondary) 50%,
+          #0d0d1a 100%
+        );
+        color: var(--text-primary);
+        line-height: 1.6;
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+
+      /* 星空背景 */
+      .stars-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0;
+        overflow: hidden;
+      }
+
+      .star {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background: white;
+        border-radius: 50%;
+        opacity: 0;
+        animation: twinkle var(--duration) ease-in-out infinite;
+        animation-delay: var(--delay);
+      }
+
+      @keyframes twinkle {
+        0%,
+        100% {
+          opacity: 0.2;
+          transform: scale(1);
         }
-
-        :root {
-            /* 主色调 */
-            --bg-primary: #0a0a0f;
-            --bg-secondary: #0f172a;
-            --bg-card: rgba(15, 23, 42, 0.6);
-            --accent-purple: #7A5BF5;
-            --accent-purple-light: #E5A4ED;
-            --accent-cyan: #21C2C1;
-            --accent-green: #84F599;
-            --accent-orange: #f97316;
-
-            /* 辅助色 */
-            --text-primary: #ffffff;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --border-glow: rgba(122, 91, 245, 0.5);
-            --border-glow-cyan: rgba(33, 194, 193, 0.5);
+        50% {
+          opacity: 1;
+          transform: scale(1.2);
         }
+      }
 
-        html {
-            scroll-behavior: smooth;
+      /* 流星效果 */
+      .meteor {
+        position: absolute;
+        width: 100px;
+        height: 1px;
+        background: linear-gradient(90deg, var(--accent-cyan), transparent);
+        opacity: 0;
+        animation: meteor 3s ease-in-out infinite;
+      }
+
+      @keyframes meteor {
+        0% {
+          transform: translateX(0) translateY(0);
+          opacity: 0;
         }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, #0d0d1a 100%);
-            color: var(--text-primary);
-            line-height: 1.6;
-            overflow-x: hidden;
-            min-height: 100vh;
+        10% {
+          opacity: 1;
         }
-
-        /* 星空背景 */
-        .stars-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
+        30% {
+          opacity: 0;
         }
-
-        .star {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: white;
-            border-radius: 50%;
-            opacity: 0;
-            animation: twinkle var(--duration) ease-in-out infinite;
-            animation-delay: var(--delay);
+        100% {
+          transform: translateX(-500px) translateY(300px);
+          opacity: 0;
         }
+      }
 
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.2; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.2); }
+      /* 主内容 */
+      .main-content {
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Hero 区域 */
+      .hero {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 2rem;
+        position: relative;
+      }
+
+      .hero-content {
+        max-width: 800px;
+        animation: fadeInUp 1s ease-out;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
         }
-
-        /* 流星效果 */
-        .meteor {
-            position: absolute;
-            width: 100px;
-            height: 1px;
-            background: linear-gradient(90deg, var(--accent-cyan), transparent);
-            opacity: 0;
-            animation: meteor 3s ease-in-out infinite;
+        to {
+          opacity: 1;
+          transform: translateY(0);
         }
+      }
 
-        @keyframes meteor {
-            0% { transform: translateX(0) translateY(0); opacity: 0; }
-            10% { opacity: 1; }
-            30% { opacity: 0; }
-            100% { transform: translateX(-500px) translateY(300px); opacity: 0; }
+      .logo {
+        font-size: 4rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        background: linear-gradient(
+          135deg,
+          var(--accent-purple-light),
+          var(--accent-purple),
+          var(--accent-cyan)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 60px rgba(122, 91, 245, 0.5);
+        letter-spacing: -1px;
+      }
+
+      .tagline {
+        font-size: 1.5rem;
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+        font-weight: 300;
+      }
+
+      .description {
+        font-size: 1.125rem;
+        color: var(--text-muted);
+        max-width: 600px;
+        margin: 0 auto 2.5rem;
+        line-height: 1.8;
+      }
+
+      /* CTA 按钮 */
+      .cta-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.875rem 2rem;
+        font-size: 1rem;
+        font-weight: 500;
+        text-decoration: none;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: none;
+      }
+
+      .btn-primary {
+        background: linear-gradient(
+          135deg,
+          var(--accent-purple),
+          var(--accent-cyan)
+        );
+        color: white;
+        box-shadow: 0 4px 20px rgba(122, 91, 245, 0.4);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(122, 91, 245, 0.6);
+      }
+
+      .btn-secondary {
+        background: var(--bg-card);
+        color: var(--text-primary);
+        border: 1px solid var(--border-glow);
+        backdrop-filter: blur(10px);
+      }
+
+      .btn-secondary:hover {
+        border-color: var(--accent-purple);
+        box-shadow: 0 0 20px rgba(122, 91, 245, 0.3);
+      }
+
+      /* SVG 图标 */
+      .btn svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      /* 滚动提示 */
+      .scroll-hint {
+        position: absolute;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        animation: bounce 2s ease-in-out infinite;
+      }
+
+      .scroll-hint svg {
+        width: 24px;
+        height: 24px;
+        color: var(--text-muted);
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateX(-50%) translateY(0);
         }
-
-        /* 主内容 */
-        .main-content {
-            position: relative;
-            z-index: 1;
+        50% {
+          transform: translateX(-50%) translateY(10px);
         }
+      }
 
-        /* Hero 区域 */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 2rem;
-            position: relative;
-        }
+      /* 区块通用样式 */
+      .section {
+        padding: 6rem 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
 
-        .hero-content {
-            max-width: 800px;
-            animation: fadeInUp 1s ease-out;
-        }
+      .section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        background: linear-gradient(
+          135deg,
+          var(--text-primary),
+          var(--text-secondary)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+      .section-subtitle {
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 1.125rem;
+        margin-bottom: 4rem;
+      }
 
+      /* Agent AI 助手区域 */
+      .agent-section {
+        background: linear-gradient(
+          135deg,
+          rgba(122, 91, 245, 0.1),
+          rgba(33, 194, 193, 0.1)
+        );
+        border-radius: 24px;
+        padding: 4rem 2rem;
+        margin-bottom: 4rem;
+        border: 1px solid rgba(122, 91, 245, 0.2);
+      }
+
+      .agent-section .section-title {
+        font-size: 2.5rem;
+        background: linear-gradient(
+          135deg,
+          var(--accent-purple-light),
+          var(--accent-cyan)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .agent-features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        margin-top: 3rem;
+      }
+
+      .agent-feature-card {
+        background: var(--bg-card);
+        border: 1px solid rgba(122, 91, 245, 0.2);
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+      }
+
+      .agent-feature-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--accent-purple);
+        box-shadow: 0 10px 40px rgba(122, 91, 245, 0.2);
+      }
+
+      .agent-feature-card.highlight {
+        border-color: var(--accent-cyan);
+        background: linear-gradient(
+          135deg,
+          rgba(33, 194, 193, 0.1),
+          rgba(122, 91, 245, 0.05)
+        );
+      }
+
+      .agent-feature-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .agent-feature-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+      }
+
+      .agent-feature-desc {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+      }
+
+      /* 对话示例 */
+      .chat-demo {
+        background: var(--bg-card);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        border: 1px solid var(--border-glow);
+      }
+
+      .chat-demo-title {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+
+      .chat-message {
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        margin-bottom: 0.75rem;
+        max-width: 80%;
+        font-size: 0.9375rem;
+      }
+
+      .chat-message.user {
+        background: rgba(122, 91, 245, 0.2);
+        margin-left: auto;
+        text-align: right;
+        border: 1px solid rgba(122, 91, 245, 0.3);
+      }
+
+      .chat-message.agent {
+        background: rgba(33, 194, 193, 0.2);
+        border: 1px solid rgba(33, 194, 193, 0.3);
+      }
+
+      /* 状态标签 */
+      .status-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-weight: 500;
+      }
+
+      .status-badge.implemented {
+        background: rgba(132, 245, 153, 0.2);
+        color: var(--accent-green);
+        border: 1px solid var(--accent-green);
+      }
+
+      .status-badge.developing {
+        background: rgba(249, 115, 22, 0.2);
+        color: var(--accent-orange);
+        border: 1px solid var(--accent-orange);
+      }
+
+      /* 八维系统网格 */
+      .dimensions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .dimension-card {
+        background: var(--bg-card);
+        border: 1px solid rgba(122, 91, 245, 0.2);
+        border-radius: 16px;
+        padding: 1.5rem;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .dimension-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          var(--accent-purple),
+          var(--accent-cyan)
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .dimension-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--accent-purple);
+        box-shadow: 0 10px 40px rgba(122, 91, 245, 0.2);
+      }
+
+      .dimension-card:hover::before {
+        opacity: 1;
+      }
+
+      .dimension-card.developing {
+        opacity: 0.7;
+      }
+
+      .dimension-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .dimension-card:nth-child(1) .dimension-icon {
+        background: linear-gradient(135deg, #ff6b6b, #ffa500);
+      }
+      .dimension-card:nth-child(2) .dimension-icon {
+        background: linear-gradient(135deg, #4ecdc4, #44a08d);
+      }
+      .dimension-card:nth-child(3) .dimension-icon {
+        background: linear-gradient(135deg, #a18cd1, #fbc2eb);
+      }
+      .dimension-card:nth-child(4) .dimension-icon {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+      }
+      .dimension-card:nth-child(5) .dimension-icon {
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+      }
+      .dimension-card:nth-child(6) .dimension-icon {
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+      }
+      .dimension-card:nth-child(7) .dimension-icon {
+        background: linear-gradient(135deg, #fa709a, #fee140);
+      }
+      .dimension-card:nth-child(8) .dimension-icon {
+        background: linear-gradient(135deg, #43e97b, #38f9d7);
+      }
+
+      .dimension-name {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+      }
+
+      .dimension-name-en {
+        font-size: 0.75rem;
+        color: var(--accent-cyan);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+      }
+
+      .dimension-desc {
+        color: var(--text-muted);
+        font-size: 0.9375rem;
+        line-height: 1.6;
+      }
+
+      /* 功能状态区块 */
+      .features-status {
+        background: var(--bg-card);
+        border-radius: 24px;
+        padding: 3rem 2rem;
+        margin-bottom: 4rem;
+        border: 1px solid rgba(122, 91, 245, 0.15);
+      }
+
+      .features-status .section-title {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .status-group {
+        margin-bottom: 2rem;
+      }
+
+      .status-group:last-child {
+        margin-bottom: 0;
+      }
+
+      .status-group h3 {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .feature-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+      }
+
+      .tag {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+      }
+
+      .tag.implemented {
+        background: rgba(132, 245, 153, 0.1);
+        border: 1px solid rgba(132, 245, 153, 0.3);
+        color: var(--accent-green);
+      }
+
+      .tag.developing {
+        background: rgba(249, 115, 22, 0.1);
+        border: 1px solid rgba(249, 115, 22, 0.3);
+        color: var(--accent-orange);
+      }
+
+      .tag:hover {
+        transform: translateY(-2px);
+      }
+
+      /* 核心特性 */
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+      }
+
+      .feature-card {
+        text-align: center;
+        padding: 2rem;
+        background: linear-gradient(
+          135deg,
+          var(--bg-card),
+          rgba(122, 91, 245, 0.05)
+        );
+        border: 1px solid rgba(122, 91, 245, 0.15);
+        border-radius: 20px;
+        transition: all 0.3s ease;
+      }
+
+      .feature-card:hover {
+        border-color: var(--accent-purple);
+        transform: scale(1.02);
+      }
+
+      .feature-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 1.5rem;
+        background: linear-gradient(
+          135deg,
+          var(--accent-purple),
+          var(--accent-cyan)
+        );
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        box-shadow: 0 8px 30px rgba(122, 91, 245, 0.3);
+      }
+
+      .feature-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+      }
+
+      .feature-desc {
+        color: var(--text-muted);
+        font-size: 0.9375rem;
+        line-height: 1.7;
+      }
+
+      /* 技术栈 */
+      .tech-stack {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 4rem;
+        flex-wrap: wrap;
+      }
+
+      .tech-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        transition: transform 0.3s ease;
+      }
+
+      .tech-item:hover {
+        transform: scale(1.1);
+      }
+
+      .tech-icon {
+        width: 80px;
+        height: 80px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-glow);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        transition: all 0.3s ease;
+      }
+
+      .tech-item:hover .tech-icon {
+        border-color: var(--accent-purple);
+        box-shadow: 0 0 30px rgba(122, 91, 245, 0.4);
+      }
+
+      .tech-name {
+        font-weight: 500;
+        color: var(--text-secondary);
+      }
+
+      /* Footer */
+      .footer {
+        text-align: center;
+        padding: 3rem 2rem;
+        border-top: 1px solid rgba(122, 91, 245, 0.2);
+        margin-top: 4rem;
+      }
+
+      .footer-content {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .footer-logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        background: linear-gradient(
+          135deg,
+          var(--accent-purple-light),
+          var(--accent-purple)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .footer-text {
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+      }
+
+      .footer-links {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .footer-link {
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: color 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .footer-link:hover {
+        color: var(--accent-purple);
+      }
+
+      .footer-link svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .copyright {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+      }
+
+      /* 响应式 */
+      @media (max-width: 768px) {
         .logo {
-            font-size: 4rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--accent-purple-light), var(--accent-purple), var(--accent-cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 60px rgba(122, 91, 245, 0.5);
-            letter-spacing: -1px;
+          font-size: 2.5rem;
         }
 
         .tagline {
-            font-size: 1.5rem;
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
-            font-weight: 300;
+          font-size: 1.125rem;
         }
 
         .description {
-            font-size: 1.125rem;
-            color: var(--text-muted);
-            max-width: 600px;
-            margin: 0 auto 2.5rem;
-            line-height: 1.8;
+          font-size: 1rem;
         }
 
-        /* CTA 按钮 */
-        .cta-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.875rem 2rem;
-            font-size: 1rem;
-            font-weight: 500;
-            text-decoration: none;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: none;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
-            color: white;
-            box-shadow: 0 4px 20px rgba(122, 91, 245, 0.4);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(122, 91, 245, 0.6);
-        }
-
-        .btn-secondary {
-            background: var(--bg-card);
-            color: var(--text-primary);
-            border: 1px solid var(--border-glow);
-            backdrop-filter: blur(10px);
-        }
-
-        .btn-secondary:hover {
-            border-color: var(--accent-purple);
-            box-shadow: 0 0 20px rgba(122, 91, 245, 0.3);
-        }
-
-        /* SVG 图标 */
-        .btn svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        /* 滚动提示 */
-        .scroll-hint {
-            position: absolute;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: bounce 2s ease-in-out infinite;
-        }
-
-        .scroll-hint svg {
-            width: 24px;
-            height: 24px;
-            color: var(--text-muted);
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(10px); }
-        }
-
-        /* 区块通用样式 */
         .section {
-            padding: 6rem 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
+          padding: 4rem 1.5rem;
         }
 
         .section-title {
-            text-align: center;
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+          font-size: 2rem;
         }
 
         .section-subtitle {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 1.125rem;
-            margin-bottom: 4rem;
+          font-size: 1rem;
+          margin-bottom: 3rem;
         }
 
-        /* Agent AI 助手区域 */
-        .agent-section {
-            background: linear-gradient(135deg, rgba(122, 91, 245, 0.1), rgba(33, 194, 193, 0.1));
-            border-radius: 24px;
-            padding: 4rem 2rem;
-            margin-bottom: 4rem;
-            border: 1px solid rgba(122, 91, 245, 0.2);
-        }
-
-        .agent-section .section-title {
-            font-size: 2.5rem;
-            background: linear-gradient(135deg, var(--accent-purple-light), var(--accent-cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .agent-features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-            margin-top: 3rem;
-        }
-
-        .agent-feature-card {
-            background: var(--bg-card);
-            border: 1px solid rgba(122, 91, 245, 0.2);
-            border-radius: 16px;
-            padding: 1.5rem;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .agent-feature-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--accent-purple);
-            box-shadow: 0 10px 40px rgba(122, 91, 245, 0.2);
-        }
-
-        .agent-feature-card.highlight {
-            border-color: var(--accent-cyan);
-            background: linear-gradient(135deg, rgba(33, 194, 193, 0.1), rgba(122, 91, 245, 0.05));
-        }
-
-        .agent-feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .agent-feature-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-        }
-
-        .agent-feature-desc {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            line-height: 1.6;
-        }
-
-        /* 对话示例 */
-        .chat-demo {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-top: 2rem;
-            border: 1px solid var(--border-glow);
-        }
-
-        .chat-demo-title {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        .chat-message {
-            padding: 0.75rem 1rem;
-            border-radius: 12px;
-            margin-bottom: 0.75rem;
-            max-width: 80%;
-            font-size: 0.9375rem;
-        }
-
-        .chat-message.user {
-            background: rgba(122, 91, 245, 0.2);
-            margin-left: auto;
-            text-align: right;
-            border: 1px solid rgba(122, 91, 245, 0.3);
-        }
-
-        .chat-message.agent {
-            background: rgba(33, 194, 193, 0.2);
-            border: 1px solid rgba(33, 194, 193, 0.3);
-        }
-
-        /* 状态标签 */
-        .status-badge {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            font-size: 0.75rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 999px;
-            font-weight: 500;
-        }
-
-        .status-badge.implemented {
-            background: rgba(132, 245, 153, 0.2);
-            color: var(--accent-green);
-            border: 1px solid var(--accent-green);
-        }
-
-        .status-badge.developing {
-            background: rgba(249, 115, 22, 0.2);
-            color: var(--accent-orange);
-            border: 1px solid var(--accent-orange);
-        }
-
-        /* 八维系统网格 */
         .dimensions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 1.5rem;
+          grid-template-columns: 1fr;
         }
 
-        .dimension-card {
-            background: var(--bg-card);
-            border: 1px solid rgba(122, 91, 245, 0.2);
-            border-radius: 16px;
-            padding: 1.5rem;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .dimension-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .dimension-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--accent-purple);
-            box-shadow: 0 10px 40px rgba(122, 91, 245, 0.2);
-        }
-
-        .dimension-card:hover::before {
-            opacity: 1;
-        }
-
-        .dimension-card.developing {
-            opacity: 0.7;
-        }
-
-        .dimension-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .dimension-card:nth-child(1) .dimension-icon { background: linear-gradient(135deg, #ff6b6b, #ffa500); }
-        .dimension-card:nth-child(2) .dimension-icon { background: linear-gradient(135deg, #4ecdc4, #44a08d); }
-        .dimension-card:nth-child(3) .dimension-icon { background: linear-gradient(135deg, #a18cd1, #fbc2eb); }
-        .dimension-card:nth-child(4) .dimension-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
-        .dimension-card:nth-child(5) .dimension-icon { background: linear-gradient(135deg, #f093fb, #f5576c); }
-        .dimension-card:nth-child(6) .dimension-icon { background: linear-gradient(135deg, #4facfe, #00f2fe); }
-        .dimension-card:nth-child(7) .dimension-icon { background: linear-gradient(135deg, #fa709a, #fee140); }
-        .dimension-card:nth-child(8) .dimension-icon { background: linear-gradient(135deg, #43e97b, #38f9d7); }
-
-        .dimension-name {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-        }
-
-        .dimension-name-en {
-            font-size: 0.75rem;
-            color: var(--accent-cyan);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 0.5rem;
-        }
-
-        .dimension-desc {
-            color: var(--text-muted);
-            font-size: 0.9375rem;
-            line-height: 1.6;
-        }
-
-        /* 功能状态区块 */
-        .features-status {
-            background: var(--bg-card);
-            border-radius: 24px;
-            padding: 3rem 2rem;
-            margin-bottom: 4rem;
-            border: 1px solid rgba(122, 91, 245, 0.15);
-        }
-
-        .features-status .section-title {
-            font-size: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .status-group {
-            margin-bottom: 2rem;
-        }
-
-        .status-group:last-child {
-            margin-bottom: 0;
-        }
-
-        .status-group h3 {
-            font-size: 1.25rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .feature-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-        }
-
-        .tag {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            transition: all 0.3s ease;
-        }
-
-        .tag.implemented {
-            background: rgba(132, 245, 153, 0.1);
-            border: 1px solid rgba(132, 245, 153, 0.3);
-            color: var(--accent-green);
-        }
-
-        .tag.developing {
-            background: rgba(249, 115, 22, 0.1);
-            border: 1px solid rgba(249, 115, 22, 0.3);
-            color: var(--accent-orange);
-        }
-
-        .tag:hover {
-            transform: translateY(-2px);
-        }
-
-        /* 核心特性 */
         .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
+          grid-template-columns: 1fr;
         }
 
-        .feature-card {
-            text-align: center;
-            padding: 2rem;
-            background: linear-gradient(135deg, var(--bg-card), rgba(122, 91, 245, 0.05));
-            border: 1px solid rgba(122, 91, 245, 0.15);
-            border-radius: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .feature-card:hover {
-            border-color: var(--accent-purple);
-            transform: scale(1.02);
-        }
-
-        .feature-icon {
-            width: 64px;
-            height: 64px;
-            margin: 0 auto 1.5rem;
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            box-shadow: 0 8px 30px rgba(122, 91, 245, 0.3);
-        }
-
-        .feature-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-        }
-
-        .feature-desc {
-            color: var(--text-muted);
-            font-size: 0.9375rem;
-            line-height: 1.7;
-        }
-
-        /* 技术栈 */
         .tech-stack {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 4rem;
-            flex-wrap: wrap;
-        }
-
-        .tech-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-            transition: transform 0.3s ease;
-        }
-
-        .tech-item:hover {
-            transform: scale(1.1);
+          gap: 2rem;
         }
 
         .tech-icon {
-            width: 80px;
-            height: 80px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-glow);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            transition: all 0.3s ease;
+          width: 60px;
+          height: 60px;
+          font-size: 2rem;
         }
 
-        .tech-item:hover .tech-icon {
-            border-color: var(--accent-purple);
-            box-shadow: 0 0 30px rgba(122, 91, 245, 0.4);
+        .cta-buttons {
+          flex-direction: column;
+          align-items: center;
         }
 
-        .tech-name {
-            font-weight: 500;
-            color: var(--text-secondary);
+        .btn {
+          width: 100%;
+          max-width: 280px;
+          justify-content: center;
         }
 
-        /* Footer */
-        .footer {
-            text-align: center;
-            padding: 3rem 2rem;
-            border-top: 1px solid rgba(122, 91, 245, 0.2);
-            margin-top: 4rem;
+        .agent-section {
+          padding: 2rem 1rem;
         }
 
-        .footer-content {
-            max-width: 600px;
-            margin: 0 auto;
+        .agent-features {
+          grid-template-columns: 1fr;
         }
 
-        .footer-logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--accent-purple-light), var(--accent-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .features-status {
+          padding: 2rem 1rem;
         }
 
-        .footer-text {
-            color: var(--text-muted);
-            margin-bottom: 1.5rem;
+        .feature-list {
+          justify-content: center;
         }
+      }
 
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .footer-link {
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: color 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .footer-link:hover {
-            color: var(--accent-purple);
-        }
-
-        .footer-link svg {
-            width: 18px;
-            height: 18px;
-        }
-
-        .copyright {
-            color: var(--text-muted);
-            font-size: 0.875rem;
-        }
-
-        /* 响应式 */
-        @media (max-width: 768px) {
-            .logo {
-                font-size: 2.5rem;
-            }
-
-            .tagline {
-                font-size: 1.125rem;
-            }
-
-            .description {
-                font-size: 1rem;
-            }
-
-            .section {
-                padding: 4rem 1.5rem;
-            }
-
-            .section-title {
-                font-size: 2rem;
-            }
-
-            .section-subtitle {
-                font-size: 1rem;
-                margin-bottom: 3rem;
-            }
-
-            .dimensions-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .tech-stack {
-                gap: 2rem;
-            }
-
-            .tech-icon {
-                width: 60px;
-                height: 60px;
-                font-size: 2rem;
-            }
-
-            .cta-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .btn {
-                width: 100%;
-                max-width: 280px;
-                justify-content: center;
-            }
-
-            .agent-section {
-                padding: 2rem 1rem;
-            }
-
-            .agent-features {
-                grid-template-columns: 1fr;
-            }
-
-            .features-status {
-                padding: 2rem 1rem;
-            }
-
-            .feature-list {
-                justify-content: center;
-            }
-        }
-
-        /* 动画延迟类 */
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.2s; }
-        .delay-3 { animation-delay: 0.3s; }
-        .delay-4 { animation-delay: 0.4s; }
-        .delay-5 { animation-delay: 0.5s; }
-        .delay-6 { animation-delay: 0.6s; }
-        .delay-7 { animation-delay: 0.7s; }
-        .delay-8 { animation-delay: 0.8s; }
+      /* 动画延迟类 */
+      .delay-1 {
+        animation-delay: 0.1s;
+      }
+      .delay-2 {
+        animation-delay: 0.2s;
+      }
+      .delay-3 {
+        animation-delay: 0.3s;
+      }
+      .delay-4 {
+        animation-delay: 0.4s;
+      }
+      .delay-5 {
+        animation-delay: 0.5s;
+      }
+      .delay-6 {
+        animation-delay: 0.6s;
+      }
+      .delay-7 {
+        animation-delay: 0.7s;
+      }
+      .delay-8 {
+        animation-delay: 0.8s;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <!-- 星空背景 -->
     <div class="stars-container" id="stars"></div>
 
     <!-- 主内容 -->
     <div class="main-content">
-        <!-- Hero 区域 -->
-        <section class="hero">
-            <div class="hero-content">
-                <h1 class="logo">Life Canvas OS</h1>
-                <p class="tagline">AI 驱动的个人成长桌面操作系统</p>
-                <p class="description">
-                    基于八维生命平衡模型，系统化管理你的人生。<br>
-                    量化生活数据，获得 AI 洞察，在极简美学中实现隐私优先的自我提升。
-                </p>
-                <div class="cta-buttons">
-                    <a href="https://github.com/yuanjingteam/life-canvas-os" target="_blank" class="btn btn-primary">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                        </svg>
-                        GitHub 下载
-                    </a>
-                    <a href="#agent" class="btn btn-secondary">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <polygon points="10,8 16,12 10,16"/>
-                        </svg>
-                        了解更多
-                    </a>
-                </div>
+      <!-- Hero 区域 -->
+      <section class="hero">
+        <div class="hero-content">
+          <h1 class="logo">Life Canvas OS</h1>
+          <p class="tagline">AI 驱动的个人成长桌面操作系统</p>
+          <p class="description">
+            基于八维生命平衡模型，系统化管理你的人生。<br />
+            量化生活数据，获得 AI 洞察，在极简美学中实现隐私优先的自我提升。
+          </p>
+          <div class="cta-buttons">
+            <a
+              href="https://github.com/yuanjingteam/life-canvas-os"
+              target="_blank"
+              class="btn btn-primary"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+                />
+              </svg>
+              GitHub 下载
+            </a>
+            <a href="#agent" class="btn btn-secondary">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <polygon points="10,8 16,12 10,16" />
+              </svg>
+              了解更多
+            </a>
+          </div>
+        </div>
+        <div class="scroll-hint">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M12 5v14M5 12l7 7 7-7" />
+          </svg>
+        </div>
+      </section>
+
+      <!-- AI 智能助手区域 -->
+      <section class="section" id="agent">
+        <div class="agent-section">
+          <h2 class="section-title">AI 智能助手</h2>
+          <p class="section-subtitle">用自然语言管理你的人生，让一切变得简单</p>
+
+          <div class="agent-features">
+            <div class="agent-feature-card highlight">
+              <div class="agent-feature-icon">🤖</div>
+              <h3 class="agent-feature-title">自然语言交互</h3>
+              <p class="agent-feature-desc">无需繁琐操作，直接对话完成任务</p>
             </div>
-            <div class="scroll-hint">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 5v14M5 12l7 7 7-7"/>
-                </svg>
+            <div class="agent-feature-card">
+              <div class="agent-feature-icon">💬</div>
+              <h3 class="agent-feature-title">多轮对话</h3>
+              <p class="agent-feature-desc">
+                记住上下文，理解"刚才"、"那篇日记"
+              </p>
             </div>
-        </section>
-
-        <!-- AI 智能助手区域 -->
-        <section class="section" id="agent">
-            <div class="agent-section">
-                <h2 class="section-title">AI 智能助手</h2>
-                <p class="section-subtitle">用自然语言管理你的人生，让一切变得简单</p>
-
-                <div class="agent-features">
-                    <div class="agent-feature-card highlight">
-                        <div class="agent-feature-icon">🤖</div>
-                        <h3 class="agent-feature-title">自然语言交互</h3>
-                        <p class="agent-feature-desc">无需繁琐操作，直接对话完成任务</p>
-                    </div>
-                    <div class="agent-feature-card">
-                        <div class="agent-feature-icon">💬</div>
-                        <h3 class="agent-feature-title">多轮对话</h3>
-                        <p class="agent-feature-desc">记住上下文，理解"刚才"、"那篇日记"</p>
-                    </div>
-                    <div class="agent-feature-card">
-                        <div class="agent-feature-icon">🎯</div>
-                        <h3 class="agent-feature-title">智能操作</h3>
-                        <p class="agent-feature-desc">创建日记、查询评分、生成洞察</p>
-                    </div>
-                    <div class="agent-feature-card">
-                        <div class="agent-feature-icon">🔒</div>
-                        <h3 class="agent-feature-title">本地运行</h3>
-                        <p class="agent-feature-desc">数据不出本地，隐私安全有保障</p>
-                    </div>
-                </div>
-
-                <!-- 对话示例 -->
-                <div class="chat-demo">
-                    <div class="chat-demo-title">对话示例</div>
-                    <div class="chat-message user">帮我记一下今天心情很好</div>
-                    <div class="chat-message agent">已为您创建日记，心情：不错 ✓</div>
-                    <div class="chat-message user">把刚才的日记内容改一下，今天完成了健身计划</div>
-                    <div class="chat-message agent">已更新日记内容，同时记录运动系统评分 +1 📝</div>
-                    <div class="chat-message user">我这周各系统的评分怎么样？</div>
-                    <div class="chat-message agent">本周评分概览：运动 85、饮食 78、认知 92、产出 88... 查看详情 →</div>
-                </div>
+            <div class="agent-feature-card">
+              <div class="agent-feature-icon">🎯</div>
+              <h3 class="agent-feature-title">智能操作</h3>
+              <p class="agent-feature-desc">创建日记、查询评分、生成洞察</p>
             </div>
-        </section>
-
-        <!-- 八维系统 -->
-        <section class="section" id="dimensions">
-            <h2 class="section-title">八维生命平衡模型</h2>
-            <p class="section-subtitle">全面覆盖人生的八个核心维度，系统化提升生活质量</p>
-            <div class="dimensions-grid">
-                <div class="dimension-card">
-                    <span class="status-badge implemented">已实现</span>
-                    <div class="dimension-icon">🍎</div>
-                    <div class="dimension-name-en">FUEL</div>
-                    <h3 class="dimension-name">饮食系统</h3>
-                    <p class="dimension-desc">追踪饮食习惯，设置健康基准，记录偏离情况</p>
-                </div>
-                <div class="dimension-card">
-                    <span class="status-badge implemented">已实现</span>
-                    <div class="dimension-icon">🏃</div>
-                    <div class="dimension-name-en">PHYSICAL</div>
-                    <h3 class="dimension-name">运动系统</h3>
-                    <p class="dimension-desc">监控运动计划，维护身体活力，量化健身目标进展</p>
-                </div>
-                <div class="dimension-card">
-                    <span class="status-badge implemented">已实现</span>
-                    <div class="dimension-icon">📚</div>
-                    <div class="dimension-name-en">INTELLECTUAL</div>
-                    <h3 class="dimension-name">认知系统</h3>
-                    <p class="dimension-desc">记录阅读进度，积累思想火花，持续提升认知能力</p>
-                </div>
-                <div class="dimension-card">
-                    <span class="status-badge implemented">已实现</span>
-                    <div class="dimension-icon">💼</div>
-                    <div class="dimension-name-en">OUTPUT</div>
-                    <h3 class="dimension-name">产出系统</h3>
-                    <p class="dimension-desc">管理工作产出，追踪 OKR 目标，提升职业效能</p>
-                </div>
-                <div class="dimension-card developing">
-                    <span class="status-badge developing">开发中</span>
-                    <div class="dimension-icon">✨</div>
-                    <div class="dimension-name-en">DREAM</div>
-                    <h3 class="dimension-name">梦想系统</h3>
-                    <p class="dimension-desc">设定并实现人生梦想，将愿景转化为可执行的行动</p>
-                </div>
-                <div class="dimension-card developing">
-                    <span class="status-badge developing">开发中</span>
-                    <div class="dimension-icon">💰</div>
-                    <div class="dimension-name-en">ASSET</div>
-                    <h3 class="dimension-name">财务系统</h3>
-                    <p class="dimension-desc">管理资产和负债，实现财务自由，规划财富增长</p>
-                </div>
-                <div class="dimension-card developing">
-                    <span class="status-badge developing">开发中</span>
-                    <div class="dimension-icon">🤝</div>
-                    <div class="dimension-name-en">CONNECTION</div>
-                    <h3 class="dimension-name">社交系统</h3>
-                    <p class="dimension-desc">维护人际关系，提升社交能量，构建有意义的人脉网络</p>
-                </div>
-                <div class="dimension-card developing">
-                    <span class="status-badge developing">开发中</span>
-                    <div class="dimension-icon">🏠</div>
-                    <div class="dimension-name-en">ENVIRONMENT</div>
-                    <h3 class="dimension-name">环境系统</h3>
-                    <p class="dimension-desc">优化生活空间，创建理想环境，提升生活品质</p>
-                </div>
+            <div class="agent-feature-card">
+              <div class="agent-feature-icon">🔒</div>
+              <h3 class="agent-feature-title">本地运行</h3>
+              <p class="agent-feature-desc">数据不出本地，隐私安全有保障</p>
             </div>
-        </section>
+          </div>
 
-        <!-- 功能状态 -->
-        <section class="section" id="status">
-            <div class="features-status">
-                <h2 class="section-title">功能状态</h2>
-
-                <div class="status-group">
-                    <h3>✅ 已实现</h3>
-                    <div class="feature-list">
-                        <span class="tag implemented">AI 智能助手</span>
-                        <span class="tag implemented">日记管理</span>
-                        <span class="tag implemented">八维评分</span>
-                        <span class="tag implemented">饮食基准</span>
-                        <span class="tag implemented">运动追踪</span>
-                        <span class="tag implemented">AI 洞察</span>
-                        <span class="tag implemented">时间线</span>
-                        <span class="tag implemented">PIN 安全认证</span>
-                        <span class="tag implemented">本地数据存储</span>
-                    </div>
-                </div>
-
-                <div class="status-group">
-                    <h3>🚧 开发中</h3>
-                    <div class="feature-list">
-                        <span class="tag developing">数据统计</span>
-                        <span class="tag developing">可视化图表</span>
-                        <span class="tag developing">数据导出</span>
-                        <span class="tag developing">云同步</span>
-                        <span class="tag developing">移动端应用</span>
-                    </div>
-                </div>
+          <!-- 对话示例 -->
+          <div class="chat-demo">
+            <div class="chat-demo-title">对话示例</div>
+            <div class="chat-message user">帮我记一下今天心情很好</div>
+            <div class="chat-message agent">已为您创建日记，心情：不错 ✓</div>
+            <div class="chat-message user">
+              把刚才的日记内容改一下，今天完成了健身计划
             </div>
-        </section>
-
-        <!-- 核心特性 -->
-        <section class="section" id="features">
-            <h2 class="section-title">核心特性</h2>
-            <p class="section-subtitle">专为个人成长设计的强大功能</p>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">📊</div>
-                    <h3 class="feature-title">系统化管理</h3>
-                    <p class="feature-desc">将人生划分为八个核心维度，每个维度独立追踪又相互关联，构建完整的人生操作系统</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🤖</div>
-                    <h3 class="feature-title">AI 助手</h3>
-                    <p class="feature-desc">内置智能助手支持自然语言交互，多轮对话记忆上下文，轻松管理日记和系统评分</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">💡</div>
-                    <h3 class="feature-title">AI 洞察</h3>
-                    <p class="feature-desc">基于八维数据提供个性化建议，帮助发现盲点和优化方向</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔒</div>
-                    <h3 class="feature-title">隐私优先</h3>
-                    <p class="feature-desc">所有数据本地存储，无需联网即可使用，你的数据完全由你掌控</p>
-                </div>
+            <div class="chat-message agent">
+              已更新日记内容，同时记录运动系统评分 +1 📝
             </div>
-        </section>
-
-        <!-- 技术栈 -->
-        <section class="section" id="tech">
-            <h2 class="section-title">技术架构</h2>
-            <p class="section-subtitle">现代化的技术栈，打造极致体验</p>
-            <div class="tech-stack">
-                <div class="tech-item">
-                    <div class="tech-icon">⚡</div>
-                    <span class="tech-name">Electron</span>
-                </div>
-                <div class="tech-item">
-                    <div class="tech-icon">⚛️</div>
-                    <span class="tech-name">React 19</span>
-                </div>
-                <div class="tech-item">
-                    <div class="tech-icon">🐍</div>
-                    <span class="tech-name">Python</span>
-                </div>
-                <div class="tech-item">
-                    <div class="tech-icon">🚀</div>
-                    <span class="tech-name">FastAPI</span>
-                </div>
-                <div class="tech-item">
-                    <div class="tech-icon">🎨</div>
-                    <span class="tech-name">TailwindCSS</span>
-                </div>
+            <div class="chat-message user">我这周各系统的评分怎么样？</div>
+            <div class="chat-message agent">
+              本周评分概览：运动 85、饮食 78、认知 92、产出 88... 查看详情 →
             </div>
-        </section>
+          </div>
+        </div>
+      </section>
 
-        <!-- Footer -->
-        <footer class="footer">
-            <div class="footer-content">
-                <div class="footer-logo">Life Canvas OS</div>
-                <p class="footer-text">让每一天都成为人生画布上精彩的一笔</p>
-                <div class="footer-links">
-                    <a href="https://github.com/yuanjingteam/life-canvas-os" target="_blank" class="footer-link">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                        </svg>
-                        GitHub
-                    </a>
-                    <a href="https://github.com/yuanjingteam/life-canvas-os/issues" target="_blank" class="footer-link">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-                            <line x1="12" y1="17" x2="12.01" y2="17"/>
-                        </svg>
-                        反馈问题
-                    </a>
-                </div>
-                <p class="copyright">© 2025 Life Canvas OS. All rights reserved.</p>
+      <!-- 八维系统 -->
+      <section class="section" id="dimensions">
+        <h2 class="section-title">八维生命平衡模型</h2>
+        <p class="section-subtitle">
+          全面覆盖人生的八个核心维度，系统化提升生活质量
+        </p>
+        <div class="dimensions-grid">
+          <div class="dimension-card">
+            <span class="status-badge implemented">已实现</span>
+            <div class="dimension-icon">🍎</div>
+            <div class="dimension-name-en">FUEL</div>
+            <h3 class="dimension-name">饮食系统</h3>
+            <p class="dimension-desc">
+              追踪饮食习惯，设置健康基准，记录偏离情况
+            </p>
+          </div>
+          <div class="dimension-card">
+            <span class="status-badge developing">开发中</span>
+            <div class="dimension-icon">🏃</div>
+            <div class="dimension-name-en">PHYSICAL</div>
+            <h3 class="dimension-name">运动系统</h3>
+            <p class="dimension-desc">
+              监控运动计划，维护身体活力，量化健身目标进展
+            </p>
+          </div>
+          <div class="dimension-card">
+            <span class="status-badge developing">开发中</span>
+            <div class="dimension-icon">📚</div>
+            <div class="dimension-name-en">INTELLECTUAL</div>
+            <h3 class="dimension-name">认知系统</h3>
+            <p class="dimension-desc">
+              记录阅读进度，积累思想火花，持续提升认知能力
+            </p>
+          </div>
+          <div class="dimension-card">
+            <span class="status-badge developing">开发中</span>
+            <div class="dimension-icon">💼</div>
+            <div class="dimension-name-en">OUTPUT</div>
+            <h3 class="dimension-name">产出系统</h3>
+            <p class="dimension-desc">
+              管理工作产出，追踪 OKR 目标，提升职业效能
+            </p>
+          </div>
+          <div class="dimension-card developing">
+            <span class="status-badge developing">开发中</span>
+            <div class="dimension-icon">✨</div>
+            <div class="dimension-name-en">DREAM</div>
+            <h3 class="dimension-name">梦想系统</h3>
+            <p class="dimension-desc">
+              设定并实现人生梦想，将愿景转化为可执行的行动
+            </p>
+          </div>
+          <div class="dimension-card developing">
+            <span class="status-badge developing">开发中</span>
+            <div class="dimension-icon">💰</div>
+            <div class="dimension-name-en">ASSET</div>
+            <h3 class="dimension-name">财务系统</h3>
+            <p class="dimension-desc">
+              管理资产和负债，实现财务自由，规划财富增长
+            </p>
+          </div>
+          <div class="dimension-card developing">
+            <span class="status-badge developing">开发中</span>
+            <div class="dimension-icon">🤝</div>
+            <div class="dimension-name-en">CONNECTION</div>
+            <h3 class="dimension-name">社交系统</h3>
+            <p class="dimension-desc">
+              维护人际关系，提升社交能量，构建有意义的人脉网络
+            </p>
+          </div>
+          <div class="dimension-card developing">
+            <span class="status-badge developing">开发中</span>
+            <div class="dimension-icon">🏠</div>
+            <div class="dimension-name-en">ENVIRONMENT</div>
+            <h3 class="dimension-name">环境系统</h3>
+            <p class="dimension-desc">
+              优化生活空间，创建理想环境，提升生活品质
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 功能状态 -->
+      <section class="section" id="status">
+        <div class="features-status">
+          <h2 class="section-title">功能状态</h2>
+
+          <div class="status-group">
+            <h3>✅ 已实现</h3>
+            <div class="feature-list">
+              <span class="tag implemented">AI 智能助手</span>
+              <span class="tag implemented">日记管理</span>
+              <span class="tag implemented">八维评分</span>
+              <span class="tag implemented">饮食基准</span>
+              <span class="tag implemented">AI 洞察</span>
+              <span class="tag implemented">时间线</span>
+              <span class="tag implemented">PIN 安全认证</span>
+              <span class="tag implemented">本地数据存储</span>
             </div>
-        </footer>
+          </div>
+
+          <div class="status-group">
+            <h3>🚧 开发中</h3>
+            <div class="feature-list">
+              <span class="tag developing">数据统计</span>
+              <span class="tag developing">运动追踪</span>
+
+              <span class="tag developing">可视化图表</span>
+              <span class="tag developing">数据导出</span>
+              <span class="tag developing">云同步</span>
+              <span class="tag developing">移动端应用</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 核心特性 -->
+      <section class="section" id="features">
+        <h2 class="section-title">核心特性</h2>
+        <p class="section-subtitle">专为个人成长设计的强大功能</p>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3 class="feature-title">系统化管理</h3>
+            <p class="feature-desc">
+              将人生划分为八个核心维度，每个维度独立追踪又相互关联，构建完整的人生操作系统
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🤖</div>
+            <h3 class="feature-title">AI 助手</h3>
+            <p class="feature-desc">
+              内置智能助手支持自然语言交互，多轮对话记忆上下文，轻松管理日记和系统评分
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">💡</div>
+            <h3 class="feature-title">AI 洞察</h3>
+            <p class="feature-desc">
+              基于八维数据提供个性化建议，帮助发现盲点和优化方向
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3 class="feature-title">隐私优先</h3>
+            <p class="feature-desc">
+              所有数据本地存储，无需联网即可使用，你的数据完全由你掌控
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 技术栈 -->
+      <section class="section" id="tech">
+        <h2 class="section-title">技术架构</h2>
+        <p class="section-subtitle">现代化的技术栈，打造极致体验</p>
+        <div class="tech-stack">
+          <div class="tech-item">
+            <div class="tech-icon">⚡</div>
+            <span class="tech-name">Electron</span>
+          </div>
+          <div class="tech-item">
+            <div class="tech-icon">⚛️</div>
+            <span class="tech-name">React 19</span>
+          </div>
+          <div class="tech-item">
+            <div class="tech-icon">🐍</div>
+            <span class="tech-name">Python</span>
+          </div>
+          <div class="tech-item">
+            <div class="tech-icon">🚀</div>
+            <span class="tech-name">FastAPI</span>
+          </div>
+          <div class="tech-item">
+            <div class="tech-icon">🎨</div>
+            <span class="tech-name">TailwindCSS</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="footer-content">
+          <div class="footer-logo">Life Canvas OS</div>
+          <p class="footer-text">让每一天都成为人生画布上精彩的一笔</p>
+          <div class="footer-links">
+            <a
+              href="https://github.com/yuanjingteam/life-canvas-os"
+              target="_blank"
+              class="footer-link"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+                />
+              </svg>
+              GitHub
+            </a>
+            <a
+              href="https://github.com/yuanjingteam/life-canvas-os/issues"
+              target="_blank"
+              class="footer-link"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+              反馈问题
+            </a>
+          </div>
+          <p class="copyright">© 2025 Life Canvas OS. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
 
     <script>
-        // 生成星空背景
-        function createStars() {
-            const container = document.getElementById('stars');
-            const starCount = 150;
+      // 生成星空背景
+      function createStars() {
+        const container = document.getElementById("stars");
+        const starCount = 150;
 
-            for (let i = 0; i < starCount; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.setProperty('--duration', (2 + Math.random() * 3) + 's');
-                star.style.setProperty('--delay', Math.random() * 5 + 's');
+        for (let i = 0; i < starCount; i++) {
+          const star = document.createElement("div");
+          star.className = "star";
+          star.style.left = Math.random() * 100 + "%";
+          star.style.top = Math.random() * 100 + "%";
+          star.style.setProperty("--duration", 2 + Math.random() * 3 + "s");
+          star.style.setProperty("--delay", Math.random() * 5 + "s");
 
-                // 随机大小
-                const size = Math.random() * 2 + 1;
-                star.style.width = size + 'px';
-                star.style.height = size + 'px';
+          // 随机大小
+          const size = Math.random() * 2 + 1;
+          star.style.width = size + "px";
+          star.style.height = size + "px";
 
-                container.appendChild(star);
-            }
-
-            // 添加流星
-            for (let i = 0; i < 3; i++) {
-                const meteor = document.createElement('div');
-                meteor.className = 'meteor';
-                meteor.style.left = (Math.random() * 50 + 50) + '%';
-                meteor.style.top = (Math.random() * 30) + '%';
-                meteor.style.animationDelay = (i * 4 + Math.random() * 2) + 's';
-                container.appendChild(meteor);
-            }
+          container.appendChild(star);
         }
 
-        // 平滑滚动
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
+        // 添加流星
+        for (let i = 0; i < 3; i++) {
+          const meteor = document.createElement("div");
+          meteor.className = "meteor";
+          meteor.style.left = Math.random() * 50 + 50 + "%";
+          meteor.style.top = Math.random() * 30 + "%";
+          meteor.style.animationDelay = i * 4 + Math.random() * 2 + "s";
+          container.appendChild(meteor);
+        }
+      }
+
+      // 平滑滚动
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute("href"));
+          if (target) {
+            target.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
             });
+          }
+        });
+      });
+
+      // 滚动动画
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = "1";
+            entry.target.style.transform = "translateY(0)";
+          }
+        });
+      }, observerOptions);
+
+      // 观察卡片元素
+      document
+        .querySelectorAll(
+          ".dimension-card, .feature-card, .tech-item, .agent-feature-card",
+        )
+        .forEach((card) => {
+          card.style.opacity = "0";
+          card.style.transform = "translateY(20px)";
+          card.style.transition = "opacity 0.6s ease, transform 0.6s ease";
+          observer.observe(card);
         });
 
-        // 滚动动画
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        // 观察卡片元素
-        document.querySelectorAll('.dimension-card, .feature-card, .tech-item, .agent-feature-card').forEach(card => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            observer.observe(card);
-        });
-
-        // 初始化
-        createStars();
+      // 初始化
+      createStars();
     </script>
-</body>
+  </body>
 </html>
